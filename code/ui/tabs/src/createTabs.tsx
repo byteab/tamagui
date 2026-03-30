@@ -97,6 +97,14 @@ export function createTabs<
       const triggerRef = React.useRef<TamaguiElement>(null)
       const groupItemProps = useGroupItem({ disabled: !!disabled })
 
+      const handleNativeLayout = React.useCallback(
+        (e: { nativeEvent: { layout: TabLayout } }) => {
+          const { x, y, width, height } = e.nativeEvent.layout
+          setLayout({ x, y, width, height })
+        },
+        []
+      )
+
       React.useEffect(() => {
         context.registerTrigger()
         return () => context.unregisterTrigger()
@@ -170,6 +178,7 @@ export function createTabs<
             disabled={disabled ?? groupItemProps.disabled}
             {...triggerProps}
             ref={composeRefs(forwardedRef, triggerRef)}
+            {...(!isWeb && { onLayout: handleNativeLayout })}
             onPress={composeEventHandlers(props.onPress ?? undefined, (event) => {
               // only call handler if it's the left button (mousedown gets triggered by all mouse buttons)
               // but not when the control key is pressed (avoiding MacOS right click)
